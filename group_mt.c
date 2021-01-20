@@ -27,27 +27,35 @@ void
 td_c_twork()
 {
     pthread_t 	ids[100];
-	pthread_attr_t	attr;
-	size_t		stacksize = 0;
-	int		j, i, rtn;
-	rtn = pthread_attr_init(&attr);
-	if (rtn != 0) error("pthread_attr_init failed", rtn);
-	rtn = pthread_attr_getstacksize(&attr, &stacksize);
-	if (rtn != 0) error("pthread_attr_getstacksize failed", rtn);
-	if (stacksize < THREAD_STACK_SIZE)
-	    stacksize = THREAD_STACK_SIZE;
-	rtn = pthread_attr_setstacksize(&attr, stacksize);
-	if (rtn != 0) error("pthread_attr_getstacksize failed", rtn);
+    pthread_attr_t	attr;
+    size_t		stacksize = 0;
+    int		j, i, rtn;
+
+    rtn = pthread_attr_init(&attr);
+    if (rtn != 0) error("pthread_attr_init failed", rtn);
+
+    rtn = pthread_attr_getstacksize(&attr, &stacksize);
+    if (rtn != 0) error("pthread_attr_getstacksize failed", rtn);
+
+    if (stacksize < THREAD_STACK_SIZE)
+        stacksize = THREAD_STACK_SIZE;
+
+    rtn = pthread_attr_setstacksize(&attr, stacksize);
+    if (rtn != 0) error("pthread_attr_getstacksize failed", rtn);
+
     for(i=1; i<=numthreads; i++) {
-	    rtn = pthread_create(ids+i, &attr, calluserfunc, NULL);
-	    if (rtn != 0 )error("pthread_create failed", rtn);
+        rtn = pthread_create(ids+i, &attr, calluserfunc, NULL);
+        if (rtn != 0 )error("pthread_create failed", rtn);
     }
-	rtn = pthread_attr_destroy(&attr);
-	if (rtn != 0) error("pthread_attr_destroy failed", rtn);
-	(void) calluserfunc(NULL);
+
+    rtn = pthread_attr_destroy(&attr);
+    if (rtn != 0) error("pthread_attr_destroy failed", rtn);
+
+    (void) calluserfunc(NULL);
+
     for(i=1; i<=numthreads; i++) {
-    	rtn = pthread_join(ids[i], (void**)0);
-	    if (rtn != 0) error("pthread_join failed", rtn);
+	    rtn = pthread_join(ids[i], (void**)0);
+        if (rtn != 0) error("pthread_join failed", rtn);
     }
 }
 
