@@ -4,10 +4,10 @@
 #include <mpi.h>
 #define	THREAD_STACK_SIZE	80000
 
-static int numthreads = 10;
+static int numthreads = 20;
 
 void *
-calluserfunc(void *args)
+thread_exec_fn(void *args)
 {
     int res;
     MPI_Comm the_comm;
@@ -44,19 +44,17 @@ td_c_twork()
     if (rtn != 0) error("pthread_attr_getstacksize failed", rtn);
 
     for(i=1; i<=numthreads; i++) {
-        rtn = pthread_create(ids+i, &attr, calluserfunc, NULL);
+        rtn = pthread_create(ids+i, &attr, thread_exec_fn, NULL);
         if (rtn != 0 )error("pthread_create failed", rtn);
     }
-
-    rtn = pthread_attr_destroy(&attr);
-    if (rtn != 0) error("pthread_attr_destroy failed", rtn);
-
-    (void) calluserfunc(NULL);
 
     for(i=1; i<=numthreads; i++) {
 	    rtn = pthread_join(ids[i], (void**)0);
         if (rtn != 0) error("pthread_join failed", rtn);
     }
+
+    rtn = pthread_attr_destroy(&attr);
+    if (rtn != 0) error("pthread_attr_destroy failed", rtn);
 }
 
 int
